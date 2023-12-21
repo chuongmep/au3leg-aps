@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <title>3-legged implicit grant test</title>
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+            textarea {
+                width: 100%;
+                height: 300px;
+            }
+        </style>
+    </head>
+    <body onload="MyStuff.onLoad()">
+        <script>
+            var MyStuff = {
+                "access_token": "",
+                "LogIn": ["Log In", "Logged In"],
+                "onLoad": function () {
+                    console.log("onLoad")
+
+                    var url = new URL(window.location.href.replace('#', '?'))
+
+                    var query_string = url.search
+
+                    var search_params = new URLSearchParams(query_string)
+
+                    MyStuff.access_token = search_params.get('access_token')
+
+                    let logInButton = document.getElementById("LogIn")
+                    logInButton.innerText = (MyStuff.access_token) ? MyStuff.LogIn[1] : MyStuff.LogIn[0]
+
+                    console.log(MyStuff.access_token)
+                },
+                "getUserInfo": function () {
+                    console.log("getUserInfo")
+
+                    if (MyStuff.access_token === "") 
+                        return
+
+                    fetch('https://developer.api.autodesk.com/userprofile/v1/users/@me', { 
+                        headers: {
+                            'Authorization': `Bearer ${MyStuff.access_token}`
+                        }
+                    })
+                    .then(res => res.text())
+                    .then(data => {
+                        let json = JSON.parse(data)
+                        let pretty = JSON.stringify(json, null, 2)
+                        MyStuff.showInfo(pretty)
+                        console.log(data)
+                    })
+                },
+                "logIn": function () {
+                    console.log("logIn")
+                    let clientId =  document.getElementById("clientId").value
+                    let scopes = "data:read+bucket:read"
+                    let redirectUri = encodeURI("https://chuongmep.github.io/au3leg-aps")
+                    window.open(`https://developer.api.autodesk.com/authentication/v1/authorize` +
+                        `?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`, "_self")
+                },
+                "showInfo": function (text) {
+                    let logInButton = document.getElementById("Info")
+                    logInButton.value = text
+                }
+            }
+        </script>
+        <input type="text" id="clientId" placeholder="Client Id" />
+        <button id="LogIn" onclick="MyStuff.logIn()">Log In</button>
+        <br /><br />
+        <button id='getTokenInfo' onclick='MyStuff.getTokenInfo()'>Get Token Info</button>
+        <br /><br />
+        <textarea id='TokenInfo'></textarea>'    
+        <br /><br />
+        <button id="GetUserInfo" onclick="MyStuff.getUserInfo()">Get User Info</button>  
+        <br /><br />
+        <textarea id="Info"></textarea>
+       
+    </body>
+</html>
