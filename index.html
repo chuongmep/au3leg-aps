@@ -55,7 +55,7 @@
                     console.log("logIn")
                     let clientId =  document.getElementById("clientId").value
                     let scopes = "data:read+bucket:read"
-                    let redirectUri = encodeURI("https://chuongmep.github.io/au3leg-aps")
+                    let redirectUri = encodeURI("https://chuongmep.github.io/au3leg-aps/api/auth")
                     window.open(`https://developer.api.autodesk.com/authentication/v1/authorize` +
                         `?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}`, "_self")
                 },
